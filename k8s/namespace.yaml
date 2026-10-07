@@ -1,0 +1,5 @@
+#namespace dedicado para la aplicación
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: microapp

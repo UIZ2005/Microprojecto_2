@@ -1,0 +1,7 @@
+Copie aquí sus 4 archivos .env (users.env, products.env, orders.env, frontend.env)
+y en cada copia cambie el nombre del host de la base de datos:
+  users_db    -> users-db
+  products_db -> products-db
+  orders_db   -> orders-db
+(Kubernetes no permite '_' en los nombres de los Services.)
+Los valores NO deben llevar comillas ni espacios alrededor del '='.

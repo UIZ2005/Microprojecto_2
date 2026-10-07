@@ -1,0 +1,36 @@
+# Consul descubrimiento de servicios
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consul
+  labels: {app: consul}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: consul}
+  template:
+    metadata:
+      labels: {app: consul}
+    spec:
+      enableServiceLinks: false
+      restartPolicy: Always
+      containers:
+        - name: consul
+          image: consul:1.15
+          args: ["agent", "-dev", "-client=0.0.0.0"]
+          ports:
+            - containerPort: 8500
+          resources:
+            requests: {cpu: 50m, memory: 64Mi}
+            limits: {memory: 256Mi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: consul
+spec:
+  type: ClusterIP
+  selector: {app: consul}
+  ports:
+    - port: 8500
+      targetPort: 8500

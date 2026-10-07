@@ -1,0 +1,192 @@
+# Bases de datos MySQL 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-db
+  labels: {app: users-db}
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: users-db}
+  template:
+    metadata:
+      labels: {app: users-db}
+    spec:
+      enableServiceLinks: false
+      restartPolicy: Always
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          envFrom:
+            - secretRef: {name: users-env}
+          env:
+            - name: MYSQL_DATABASE      
+              value: UsersDatabase
+          ports:
+            - containerPort: 3306
+          startupProbe:
+            exec:
+              command: ["sh", "-c", "mysqladmin ping -h 127.0.0.1 -u root -p\"$MYSQL_ROOT_PASSWORD\""]
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "mysqladmin ping -h 127.0.0.1 -u root -p\"$MYSQL_ROOT_PASSWORD\""]
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {memory: 768Mi}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+            - name: initdb
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: initdb
+          configMap:
+            name: users-initdb
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-db
+spec:
+  type: ClusterIP
+  selector: {app: users-db}
+  ports:
+    - port: 3306
+      targetPort: 3306
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: products-db
+  labels: {app: products-db}
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: products-db}
+  template:
+    metadata:
+      labels: {app: products-db}
+    spec:
+      enableServiceLinks: false
+      restartPolicy: Always
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          envFrom:
+            - secretRef: {name: products-env}
+          env:
+            - name: MYSQL_DATABASE      
+              value: ProductsDatabase
+          ports:
+            - containerPort: 3306
+          startupProbe:
+            exec:
+              command: ["sh", "-c", "mysqladmin ping -h 127.0.0.1 -u root -p\"$MYSQL_ROOT_PASSWORD\""]
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "mysqladmin ping -h 127.0.0.1 -u root -p\"$MYSQL_ROOT_PASSWORD\""]
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {memory: 768Mi}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+            - name: initdb
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: initdb
+          configMap:
+            name: products-initdb
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: products-db
+spec:
+  type: ClusterIP
+  selector: {app: products-db}
+  ports:
+    - port: 3306
+      targetPort: 3306
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-db
+  labels: {app: orders-db}
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: orders-db}
+  template:
+    metadata:
+      labels: {app: orders-db}
+    spec:
+      enableServiceLinks: false
+      restartPolicy: Always
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          envFrom:
+            - secretRef: {name: orders-env}
+          env:
+            - name: MYSQL_DATABASE      
+              value: OrdersDatabase
+          ports:
+            - containerPort: 3306
+          startupProbe:
+            exec:
+              command: ["sh", "-c", "mysqladmin ping -h 127.0.0.1 -u root -p\"$MYSQL_ROOT_PASSWORD\""]
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "mysqladmin ping -h 127.0.0.1 -u root -p\"$MYSQL_ROOT_PASSWORD\""]
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {memory: 768Mi}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+            - name: initdb
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: initdb
+          configMap:
+            name: orders-initdb
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders-db
+spec:
+  type: ClusterIP
+  selector: {app: orders-db}
+  ports:
+    - port: 3306
+      targetPort: 3306

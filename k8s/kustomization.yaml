@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: microapp           
+
+resources:
+  - namespace.yaml
+  - consul.yaml
+  - databases.yaml
+  - users.yaml
+  - products.yaml
+  - orders.yaml
+  - frontend.yaml
+  - ingress.yaml
+
+secretGenerator:
+  - name: users-env
+    envs: [env/users.env]
+  - name: products-env
+    envs: [env/products.env]
+  - name: orders-env
+    envs: [env/ordenes.env]
+  - name: frontend-env
+    envs: [env/front.env]
+
+configMapGenerator:
+  - name: users-initdb
+    files: [sql/users.sql]
+  - name: products-initdb
+    files: [sql/products.sql]
+  - name: orders-initdb
+    files: [sql/orders.sql]

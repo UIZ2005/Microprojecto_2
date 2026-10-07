@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users
+  labels: {app: users}
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: users}
+  template:
+    metadata:
+      labels: {app: users}
+    spec:
+      enableServiceLinks: false    
+      restartPolicy: Always        
+      containers:
+        - name: users
+          image: uiiz/users-service:1.0
+          ports:
+            - containerPort: 3001
+          envFrom:
+            - secretRef: {name: users-env}
+          env:
+            - name: CONSUL_HTTP_ADDR
+              value: "consul:8500"
+            - name: CONSUL_HOST
+              value: "consul"
+            - name: CONSUL_PORT
+              value: "8500"
+          readinessProbe:           
+            httpGet: {path: /healthcheck, port: 3001}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:            
+            httpGet: {path: /healthcheck, port: 3001}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources:
+            requests: {cpu: 50m, memory: 64Mi}
+            limits: {memory: 256Mi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: users                          
+spec:
+  type: ClusterIP
+  selector: {app: users}
+  ports:
+    - port: 3001
+      targetPort: 3001
