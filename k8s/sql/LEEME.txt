@@ -1,1 +1,0 @@
-Copie aquí init_Users.sql, init_Products.sql e init_Orders.sql (sin cambios).
